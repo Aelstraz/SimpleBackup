@@ -63,10 +63,15 @@
             this.label24 = new System.Windows.Forms.Label();
             this.transferUnchangedFilesCheckBox = new System.Windows.Forms.CheckBox();
             this.useMD5ForComparisonCheckBox = new System.Windows.Forms.CheckBox();
+            this.label32 = new System.Windows.Forms.Label();
+            this.writeToLogCheckBox = new System.Windows.Forms.CheckBox();
             this.scheduleTabPage = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel11 = new System.Windows.Forms.TableLayoutPanel();
             this.saveScheduleButton = new System.Windows.Forms.Button();
             this.scheduleTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel18 = new System.Windows.Forms.TableLayoutPanel();
+            this.label33 = new System.Windows.Forms.Label();
+            this.scheduleAutoCloseCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.scheduleTabControl = new System.Windows.Forms.TabControl();
             this.dailyTabPage = new System.Windows.Forms.TabPage();
@@ -122,20 +127,6 @@
             this.label23 = new System.Windows.Forms.Label();
             this.tableLayoutPanel17 = new System.Windows.Forms.TableLayoutPanel();
             this.filterRemoveButton = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.filterIgnoreCaseCheckBox = new System.Windows.Forms.CheckBox();
-            this.label31 = new System.Windows.Forms.Label();
-            this.filterPathTextBox = new System.Windows.Forms.TextBox();
-            this.label28 = new System.Windows.Forms.Label();
-            this.filterComparerTypeComboBox = new System.Windows.Forms.ComboBox();
-            this.label27 = new System.Windows.Forms.Label();
-            this.filterPathTypeComboBox = new System.Windows.Forms.ComboBox();
-            this.label26 = new System.Windows.Forms.Label();
-            this.label25 = new System.Windows.Forms.Label();
-            this.filterIgnoreComboBox = new System.Windows.Forms.ComboBox();
-            this.filterAddButton = new System.Windows.Forms.Button();
-            this.label32 = new System.Windows.Forms.Label();
-            this.writeToLogCheckBox = new System.Windows.Forms.CheckBox();
             this.filterListView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -143,9 +134,21 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.tableLayoutPanel18 = new System.Windows.Forms.TableLayoutPanel();
-            this.label33 = new System.Windows.Forms.Label();
-            this.scheduleAutoCloseCheckBox = new System.Windows.Forms.CheckBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.filterComparerTypeComboBox = new System.Windows.Forms.ComboBox();
+            this.label27 = new System.Windows.Forms.Label();
+            this.filterPathTypeComboBox = new System.Windows.Forms.ComboBox();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
+            this.filterIgnoreComboBox = new System.Windows.Forms.ComboBox();
+            this.filterAddButton = new System.Windows.Forms.Button();
+            this.label28 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
+            this.filterPathTextBox = new System.Windows.Forms.TextBox();
+            this.filterIgnoreCaseCheckBox = new System.Windows.Forms.CheckBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.checkForUpdateCheckBox = new System.Windows.Forms.CheckBox();
+            this.checkForUpdateButton = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.mainTabPage.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -158,6 +161,7 @@
             this.scheduleTabPage.SuspendLayout();
             this.tableLayoutPanel11.SuspendLayout();
             this.scheduleTableLayoutPanel.SuspendLayout();
+            this.tableLayoutPanel18.SuspendLayout();
             this.scheduleTabControl.SuspendLayout();
             this.dailyTabPage.SuspendLayout();
             this.tableLayoutPanel8.SuspendLayout();
@@ -177,7 +181,6 @@
             this.tableLayoutPanel16.SuspendLayout();
             this.tableLayoutPanel17.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.tableLayoutPanel18.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl
@@ -192,7 +195,7 @@
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(612, 560);
+            this.tabControl.Size = new System.Drawing.Size(612, 609);
             this.tabControl.TabIndex = 1;
             this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_SelectedIndexChanged);
             // 
@@ -203,7 +206,7 @@
             this.mainTabPage.Location = new System.Drawing.Point(4, 22);
             this.mainTabPage.Name = "mainTabPage";
             this.mainTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.mainTabPage.Size = new System.Drawing.Size(604, 534);
+            this.mainTabPage.Size = new System.Drawing.Size(604, 583);
             this.mainTabPage.TabIndex = 0;
             this.mainTabPage.Text = "Main";
             this.mainTabPage.UseVisualStyleBackColor = true;
@@ -229,14 +232,14 @@
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(598, 528);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(598, 577);
             this.tableLayoutPanel5.TabIndex = 2;
             // 
             // backupButton
             // 
             this.backupButton.AutoSize = true;
             this.backupButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.backupButton.Location = new System.Drawing.Point(3, 491);
+            this.backupButton.Location = new System.Drawing.Point(3, 541);
             this.backupButton.Name = "backupButton";
             this.backupButton.Size = new System.Drawing.Size(592, 33);
             this.backupButton.TabIndex = 0;
@@ -252,13 +255,13 @@
             this.infoTextBox.Name = "infoTextBox";
             this.infoTextBox.ReadOnly = true;
             this.infoTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.infoTextBox.Size = new System.Drawing.Size(592, 410);
+            this.infoTextBox.Size = new System.Drawing.Size(592, 460);
             this.infoTextBox.TabIndex = 1;
             // 
             // backupProgressBar
             // 
             this.backupProgressBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.backupProgressBar.Location = new System.Drawing.Point(3, 458);
+            this.backupProgressBar.Location = new System.Drawing.Point(3, 508);
             this.backupProgressBar.Name = "backupProgressBar";
             this.backupProgressBar.Size = new System.Drawing.Size(592, 27);
             this.backupProgressBar.TabIndex = 3;
@@ -268,7 +271,7 @@
             // 
             this.dataTransferedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.dataTransferedLabel.AutoSize = true;
-            this.dataTransferedLabel.Location = new System.Drawing.Point(508, 442);
+            this.dataTransferedLabel.Location = new System.Drawing.Point(508, 492);
             this.dataTransferedLabel.Name = "dataTransferedLabel";
             this.dataTransferedLabel.Size = new System.Drawing.Size(87, 13);
             this.dataTransferedLabel.TabIndex = 1;
@@ -278,7 +281,7 @@
             // 
             this.transferSpeedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.transferSpeedLabel.AutoSize = true;
-            this.transferSpeedLabel.Location = new System.Drawing.Point(512, 429);
+            this.transferSpeedLabel.Location = new System.Drawing.Point(512, 479);
             this.transferSpeedLabel.Name = "transferSpeedLabel";
             this.transferSpeedLabel.Size = new System.Drawing.Size(83, 13);
             this.transferSpeedLabel.TabIndex = 5;
@@ -288,7 +291,7 @@
             // 
             this.estimatedTimeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.estimatedTimeLabel.AutoSize = true;
-            this.estimatedTimeLabel.Location = new System.Drawing.Point(513, 416);
+            this.estimatedTimeLabel.Location = new System.Drawing.Point(513, 466);
             this.estimatedTimeLabel.Name = "estimatedTimeLabel";
             this.estimatedTimeLabel.Size = new System.Drawing.Size(82, 13);
             this.estimatedTimeLabel.TabIndex = 4;
@@ -301,7 +304,7 @@
             this.settingsTabPage.Location = new System.Drawing.Point(4, 22);
             this.settingsTabPage.Name = "settingsTabPage";
             this.settingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.settingsTabPage.Size = new System.Drawing.Size(604, 534);
+            this.settingsTabPage.Size = new System.Drawing.Size(604, 583);
             this.settingsTabPage.TabIndex = 1;
             this.settingsTabPage.Text = "Settings";
             this.settingsTabPage.UseVisualStyleBackColor = true;
@@ -318,13 +321,13 @@
             this.tableLayoutPanel12.RowCount = 2;
             this.tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel12.Size = new System.Drawing.Size(598, 528);
+            this.tableLayoutPanel12.Size = new System.Drawing.Size(598, 577);
             this.tableLayoutPanel12.TabIndex = 3;
             // 
             // saveSettingsButton
             // 
             this.saveSettingsButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.saveSettingsButton.Location = new System.Drawing.Point(261, 499);
+            this.saveSettingsButton.Location = new System.Drawing.Point(261, 551);
             this.saveSettingsButton.Name = "saveSettingsButton";
             this.saveSettingsButton.Size = new System.Drawing.Size(75, 23);
             this.saveSettingsButton.TabIndex = 2;
@@ -353,12 +356,15 @@
             this.tableLayoutPanel2.Controls.Add(this.label24, 0, 7);
             this.tableLayoutPanel2.Controls.Add(this.transferUnchangedFilesCheckBox, 1, 8);
             this.tableLayoutPanel2.Controls.Add(this.useMD5ForComparisonCheckBox, 1, 7);
+            this.tableLayoutPanel2.Controls.Add(this.label34, 0, 10);
             this.tableLayoutPanel2.Controls.Add(this.label32, 0, 9);
+            this.tableLayoutPanel2.Controls.Add(this.checkForUpdateCheckBox, 1, 10);
             this.tableLayoutPanel2.Controls.Add(this.writeToLogCheckBox, 1, 9);
+            this.tableLayoutPanel2.Controls.Add(this.checkForUpdateButton, 1, 11);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 10;
+            this.tableLayoutPanel2.RowCount = 12;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -368,8 +374,10 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(592, 490);
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(592, 542);
             this.tableLayoutPanel2.TabIndex = 1;
             // 
             // destinationsListBox
@@ -612,6 +620,26 @@
             this.useMD5ForComparisonCheckBox.TabIndex = 21;
             this.useMD5ForComparisonCheckBox.UseVisualStyleBackColor = true;
             // 
+            // label32
+            // 
+            this.label32.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(185, 473);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(132, 13);
+            this.label32.TabIndex = 22;
+            this.label32.Text = "Write To External Log File:";
+            // 
+            // writeToLogCheckBox
+            // 
+            this.writeToLogCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.writeToLogCheckBox.AutoSize = true;
+            this.writeToLogCheckBox.Location = new System.Drawing.Point(323, 473);
+            this.writeToLogCheckBox.Name = "writeToLogCheckBox";
+            this.writeToLogCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.writeToLogCheckBox.TabIndex = 23;
+            this.writeToLogCheckBox.UseVisualStyleBackColor = true;
+            // 
             // scheduleTabPage
             // 
             this.scheduleTabPage.Controls.Add(this.tableLayoutPanel11);
@@ -668,6 +696,41 @@
             this.scheduleTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.scheduleTableLayoutPanel.Size = new System.Drawing.Size(592, 263);
             this.scheduleTableLayoutPanel.TabIndex = 0;
+            // 
+            // tableLayoutPanel18
+            // 
+            this.tableLayoutPanel18.ColumnCount = 2;
+            this.tableLayoutPanel18.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.64189F));
+            this.tableLayoutPanel18.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.35811F));
+            this.tableLayoutPanel18.Controls.Add(this.label33, 0, 0);
+            this.tableLayoutPanel18.Controls.Add(this.scheduleAutoCloseCheckBox, 1, 0);
+            this.tableLayoutPanel18.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tableLayoutPanel18.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel18.Name = "tableLayoutPanel18";
+            this.tableLayoutPanel18.RowCount = 1;
+            this.tableLayoutPanel18.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+            this.tableLayoutPanel18.Size = new System.Drawing.Size(586, 32);
+            this.tableLayoutPanel18.TabIndex = 7;
+            // 
+            // label33
+            // 
+            this.label33.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(60, 9);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(145, 13);
+            this.label33.TabIndex = 3;
+            this.label33.Text = "Auto Close Upon Completion:";
+            // 
+            // scheduleAutoCloseCheckBox
+            // 
+            this.scheduleAutoCloseCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.scheduleAutoCloseCheckBox.AutoSize = true;
+            this.scheduleAutoCloseCheckBox.Location = new System.Drawing.Point(211, 9);
+            this.scheduleAutoCloseCheckBox.Name = "scheduleAutoCloseCheckBox";
+            this.scheduleAutoCloseCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.scheduleAutoCloseCheckBox.TabIndex = 4;
+            this.scheduleAutoCloseCheckBox.UseVisualStyleBackColor = true;
             // 
             // label4
             // 
@@ -1348,6 +1411,58 @@
             this.filterRemoveButton.UseVisualStyleBackColor = true;
             this.filterRemoveButton.Click += new System.EventHandler(this.filterRemoveButton_Click);
             // 
+            // filterListView
+            // 
+            this.filterListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5,
+            this.columnHeader6});
+            this.filterListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.filterListView.FullRowSelect = true;
+            this.filterListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.filterListView.HideSelection = false;
+            this.filterListView.Location = new System.Drawing.Point(167, 16);
+            this.filterListView.MultiSelect = false;
+            this.filterListView.Name = "filterListView";
+            this.filterListView.ShowGroups = false;
+            this.filterListView.Size = new System.Drawing.Size(422, 216);
+            this.filterListView.TabIndex = 20;
+            this.filterListView.UseCompatibleStateImageBehavior = false;
+            this.filterListView.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "#";
+            this.columnHeader1.Width = 22;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "IgnoreType";
+            this.columnHeader2.Width = 68;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "PathType";
+            this.columnHeader3.Width = 61;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "MatchType";
+            this.columnHeader4.Width = 67;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Value";
+            this.columnHeader5.Width = 134;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "IgnoreCase";
+            this.columnHeader6.Width = 66;
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 2;
@@ -1376,45 +1491,6 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.Size = new System.Drawing.Size(592, 164);
             this.tableLayoutPanel1.TabIndex = 5;
-            // 
-            // filterIgnoreCaseCheckBox
-            // 
-            this.filterIgnoreCaseCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.filterIgnoreCaseCheckBox.AutoSize = true;
-            this.filterIgnoreCaseCheckBox.Location = new System.Drawing.Point(167, 110);
-            this.filterIgnoreCaseCheckBox.Name = "filterIgnoreCaseCheckBox";
-            this.filterIgnoreCaseCheckBox.Size = new System.Drawing.Size(15, 14);
-            this.filterIgnoreCaseCheckBox.TabIndex = 37;
-            this.filterIgnoreCaseCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // label31
-            // 
-            this.label31.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(94, 110);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(67, 13);
-            this.label31.TabIndex = 36;
-            this.label31.Text = "Ignore Case:";
-            // 
-            // filterPathTextBox
-            // 
-            this.filterPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.filterPathTextBox.Location = new System.Drawing.Point(167, 84);
-            this.filterPathTextBox.Name = "filterPathTextBox";
-            this.filterPathTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.filterPathTextBox.Size = new System.Drawing.Size(422, 20);
-            this.filterPathTextBox.TabIndex = 34;
-            // 
-            // label28
-            // 
-            this.label28.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(16, 87);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(145, 13);
-            this.label28.TabIndex = 33;
-            this.label28.Text = "Path/File/Extension To Filter:";
             // 
             // filterComparerTypeComboBox
             // 
@@ -1490,118 +1566,82 @@
             this.filterAddButton.UseVisualStyleBackColor = true;
             this.filterAddButton.Click += new System.EventHandler(this.filterAddButton_Click);
             // 
-            // label32
+            // label28
             // 
-            this.label32.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(185, 473);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(132, 13);
-            this.label32.TabIndex = 22;
-            this.label32.Text = "Write To External Log File:";
+            this.label28.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(16, 87);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(145, 13);
+            this.label28.TabIndex = 33;
+            this.label28.Text = "Path/File/Extension To Filter:";
             // 
-            // writeToLogCheckBox
+            // label31
             // 
-            this.writeToLogCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.writeToLogCheckBox.AutoSize = true;
-            this.writeToLogCheckBox.Location = new System.Drawing.Point(323, 473);
-            this.writeToLogCheckBox.Name = "writeToLogCheckBox";
-            this.writeToLogCheckBox.Size = new System.Drawing.Size(15, 14);
-            this.writeToLogCheckBox.TabIndex = 23;
-            this.writeToLogCheckBox.UseVisualStyleBackColor = true;
+            this.label31.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(94, 110);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(67, 13);
+            this.label31.TabIndex = 36;
+            this.label31.Text = "Ignore Case:";
             // 
-            // filterListView
+            // filterPathTextBox
             // 
-            this.filterListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5,
-            this.columnHeader6});
-            this.filterListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.filterListView.FullRowSelect = true;
-            this.filterListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.filterListView.HideSelection = false;
-            this.filterListView.Location = new System.Drawing.Point(167, 16);
-            this.filterListView.MultiSelect = false;
-            this.filterListView.Name = "filterListView";
-            this.filterListView.ShowGroups = false;
-            this.filterListView.Size = new System.Drawing.Size(422, 216);
-            this.filterListView.TabIndex = 20;
-            this.filterListView.UseCompatibleStateImageBehavior = false;
-            this.filterListView.View = System.Windows.Forms.View.Details;
+            this.filterPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.filterPathTextBox.Location = new System.Drawing.Point(167, 84);
+            this.filterPathTextBox.Name = "filterPathTextBox";
+            this.filterPathTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            this.filterPathTextBox.Size = new System.Drawing.Size(422, 20);
+            this.filterPathTextBox.TabIndex = 34;
             // 
-            // columnHeader1
+            // filterIgnoreCaseCheckBox
             // 
-            this.columnHeader1.Text = "#";
-            this.columnHeader1.Width = 22;
+            this.filterIgnoreCaseCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.filterIgnoreCaseCheckBox.AutoSize = true;
+            this.filterIgnoreCaseCheckBox.Location = new System.Drawing.Point(167, 110);
+            this.filterIgnoreCaseCheckBox.Name = "filterIgnoreCaseCheckBox";
+            this.filterIgnoreCaseCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.filterIgnoreCaseCheckBox.TabIndex = 37;
+            this.filterIgnoreCaseCheckBox.UseVisualStyleBackColor = true;
             // 
-            // columnHeader2
+            // label34
             // 
-            this.columnHeader2.Text = "IgnoreType";
-            this.columnHeader2.Width = 68;
+            this.label34.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(164, 493);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(153, 13);
+            this.label34.TabIndex = 24;
+            this.label34.Text = "Check For Update On Launch:";
             // 
-            // columnHeader3
+            // checkForUpdateCheckBox
             // 
-            this.columnHeader3.Text = "PathType";
-            this.columnHeader3.Width = 61;
+            this.checkForUpdateCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.checkForUpdateCheckBox.AutoSize = true;
+            this.checkForUpdateCheckBox.Location = new System.Drawing.Point(323, 493);
+            this.checkForUpdateCheckBox.Name = "checkForUpdateCheckBox";
+            this.checkForUpdateCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.checkForUpdateCheckBox.TabIndex = 25;
+            this.checkForUpdateCheckBox.UseVisualStyleBackColor = true;
             // 
-            // columnHeader4
+            // checkForUpdateButton
             // 
-            this.columnHeader4.Text = "MatchType";
-            this.columnHeader4.Width = 67;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.Text = "Value";
-            this.columnHeader5.Width = 134;
-            // 
-            // columnHeader6
-            // 
-            this.columnHeader6.Text = "IgnoreCase";
-            this.columnHeader6.Width = 66;
-            // 
-            // tableLayoutPanel18
-            // 
-            this.tableLayoutPanel18.ColumnCount = 2;
-            this.tableLayoutPanel18.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.64189F));
-            this.tableLayoutPanel18.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.35811F));
-            this.tableLayoutPanel18.Controls.Add(this.label33, 0, 0);
-            this.tableLayoutPanel18.Controls.Add(this.scheduleAutoCloseCheckBox, 1, 0);
-            this.tableLayoutPanel18.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel18.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel18.Name = "tableLayoutPanel18";
-            this.tableLayoutPanel18.RowCount = 1;
-            this.tableLayoutPanel18.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel18.Size = new System.Drawing.Size(586, 32);
-            this.tableLayoutPanel18.TabIndex = 7;
-            // 
-            // label33
-            // 
-            this.label33.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(60, 9);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(145, 13);
-            this.label33.TabIndex = 3;
-            this.label33.Text = "Auto Close Upon Completion:";
-            // 
-            // scheduleAutoCloseCheckBox
-            // 
-            this.scheduleAutoCloseCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.scheduleAutoCloseCheckBox.AutoSize = true;
-            this.scheduleAutoCloseCheckBox.Location = new System.Drawing.Point(211, 9);
-            this.scheduleAutoCloseCheckBox.Name = "scheduleAutoCloseCheckBox";
-            this.scheduleAutoCloseCheckBox.Size = new System.Drawing.Size(15, 14);
-            this.scheduleAutoCloseCheckBox.TabIndex = 4;
-            this.scheduleAutoCloseCheckBox.UseVisualStyleBackColor = true;
+            this.checkForUpdateButton.AutoSize = true;
+            this.checkForUpdateButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.checkForUpdateButton.Location = new System.Drawing.Point(323, 513);
+            this.checkForUpdateButton.Name = "checkForUpdateButton";
+            this.checkForUpdateButton.Size = new System.Drawing.Size(266, 23);
+            this.checkForUpdateButton.TabIndex = 26;
+            this.checkForUpdateButton.Text = "Check For Update";
+            this.checkForUpdateButton.UseVisualStyleBackColor = true;
+            this.checkForUpdateButton.Click += new System.EventHandler(this.checkForUpdateButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(612, 560);
+            this.ClientSize = new System.Drawing.Size(612, 609);
             this.Controls.Add(this.tabControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -1626,6 +1666,8 @@
             this.tableLayoutPanel11.ResumeLayout(false);
             this.scheduleTableLayoutPanel.ResumeLayout(false);
             this.scheduleTableLayoutPanel.PerformLayout();
+            this.tableLayoutPanel18.ResumeLayout(false);
+            this.tableLayoutPanel18.PerformLayout();
             this.scheduleTabControl.ResumeLayout(false);
             this.dailyTabPage.ResumeLayout(false);
             this.tableLayoutPanel8.ResumeLayout(false);
@@ -1655,8 +1697,6 @@
             this.tableLayoutPanel17.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.tableLayoutPanel18.ResumeLayout(false);
-            this.tableLayoutPanel18.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1779,6 +1819,9 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel18;
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.CheckBox scheduleAutoCloseCheckBox;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.CheckBox checkForUpdateCheckBox;
+        private System.Windows.Forms.Button checkForUpdateButton;
     }
 }
 

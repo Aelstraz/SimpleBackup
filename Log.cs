@@ -16,6 +16,7 @@ namespace SimpleBackup
         private static readonly int maxLogFileSizeKB = 30;
         public static event EventHandler OnLogUpdated;
         private static List<string> sessionErrors = new List<string>();
+        private static readonly int maxSessionErrors = 100;
 
         public static void WriteLine(string text, bool isError = false, bool addTimeStamp = true)
         {
@@ -29,7 +30,14 @@ namespace SimpleBackup
 
                     if (isError)
                     {
-                        sessionErrors.Add("ERROR: " + text);
+                        if (sessionErrors.Count <= maxSessionErrors)
+                        {
+                            sessionErrors.Add("ERROR: " + text);
+                        }
+                        else
+                        {
+                            WriteLine("Reached max amount of recorded errors, no new errors will be saved until cleared");
+                        }
                     }
 
                     if (addTimeStamp)

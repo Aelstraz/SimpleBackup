@@ -20,16 +20,20 @@ namespace SimpleBackup
 {
     public partial class Form1 : Form
     {
-        private static Thread thread = null;
+        private static Thread backupThread = null;
+        private static Thread appUpdateThread = null;
         private static Timer transferStatTimer = null;
         private static bool backupIsRunning = false;
         private static bool autoRun = false;
         private static SmtpClient smtpClient = null;
         private static bool isSendingEmail = false;
         private static bool isSendingTestEmail = false;
+        private static bool isCheckingForUpdateOnLaunch = false;
         private static readonly int maxMD5ExtraTransferAttempts = 1;
         private static readonly int maxThreadAbortWaitTime = 1000;
         private static readonly int maxInfoTextBoxLines = 400;
+        private static readonly string updateServerUrl = "https://github.com/Aelstraz/SimpleBackup/releases/latest";
+        private static readonly int updateServerRequestTimeOut = 5000;
 
         //variables for tracking transfer stats
         private static DateTime backupStartTime = new DateTime();
@@ -41,12 +45,17 @@ namespace SimpleBackup
         private static List<ulong> transferSpeedHistoryListStat = new List<ulong>();
         private static readonly int transferSpeedHistoryMaxSize = 25;
 
+        /// <summary>
+        /// Creates a new form, checks passed runtime args and checks for any new app updates from: <see href="https://github.com/Aelstraz/SimpleBackup/releases/latest"></see>
+        /// </summary>
+        /// <param name="args">Passed runtime arguments, supported args include: "scheduledRun" (begins the application in auto-run mode, used with Windows Task Scheduler)</param>
         public Form1(string[] args)
         {
             InitializeComponent();
 
             Settings.Load();
             Log.OnLogUpdated += OnLogUpdatedCallback;
+
             //get build version
             string buildVersion = "v" + System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
             Log.WriteLine("--Welcome to SimpleBackup " + buildVersion + "--");
@@ -59,6 +68,14 @@ namespace SimpleBackup
                 autoRun = true;
                 WindowState = FormWindowState.Minimized;
                 StartBackupThread();
+            }
+
+            //only check for update on launch if set, and auto close is not set
+            if (Settings.data.checkForUpdateOnLaunch && (!autoRun || autoRun && !Settings.data.scheduleAutoClose))
+            {
+                isCheckingForUpdateOnLaunch = true;
+                //check for latest app version
+                StartAppUpdateCheckThread();
             }
         }
 
@@ -81,9 +98,9 @@ namespace SimpleBackup
 
                 //create a new thread to run the backup on
                 ThreadStart threadStart = new ThreadStart(Backup);
-                thread = new Thread(threadStart);
-                thread.IsBackground = true;
-                thread.Start();
+                backupThread = new Thread(threadStart);
+                backupThread.IsBackground = true;
+                backupThread.Start();
 
                 //start a timer to track transfer stats
                 transferStatTimer = new Timer(1000);
@@ -135,7 +152,7 @@ namespace SimpleBackup
                 Log.WriteLine("Starting file transfer");
 
                 //calback to main thread
-                if (thread.ThreadState != ThreadState.AbortRequested && thread.ThreadState != ThreadState.Aborted)
+                if (backupThread.ThreadState != ThreadState.AbortRequested && backupThread.ThreadState != ThreadState.Aborted)
                 {
                     Invoke(new Action(() => OnStartBackupCallback(totalSizeOfFiles)));
                 }
@@ -147,7 +164,7 @@ namespace SimpleBackup
             UpdateBackupFolderNames(ref backupFolderUpdateList);
 
             //calback to main thread
-            if (thread.ThreadState != ThreadState.AbortRequested && thread.ThreadState != ThreadState.Aborted)
+            if (backupThread.ThreadState != ThreadState.AbortRequested && backupThread.ThreadState != ThreadState.Aborted)
             {
                 Invoke(new Action(() => FinishTransfer()));
             }
@@ -693,7 +710,7 @@ namespace SimpleBackup
             {
                 Log.WriteLine("Couldn't find file at src to transfer: '" + srcPath + "'", isError: true);
 
-                if (thread.ThreadState != ThreadState.AbortRequested && thread.ThreadState != ThreadState.Aborted)
+                if (backupThread.ThreadState != ThreadState.AbortRequested && backupThread.ThreadState != ThreadState.Aborted)
                 {
                     Invoke(new Action(() => OnFailedFileTransferCallback(fileSize)));
                 }
@@ -702,7 +719,7 @@ namespace SimpleBackup
             }
 
             //callback to main thread
-            if (thread.ThreadState != ThreadState.AbortRequested && thread.ThreadState != ThreadState.Aborted)
+            if (backupThread.ThreadState != ThreadState.AbortRequested && backupThread.ThreadState != ThreadState.Aborted)
             {
                 Invoke(new Action(() => OnStartFileTransferCallback(dstPath)));
             }
@@ -800,7 +817,7 @@ namespace SimpleBackup
             }
 
             //callback to main thread
-            if (finishTransfer && thread.ThreadState != ThreadState.AbortRequested && thread.ThreadState != ThreadState.Aborted)
+            if (finishTransfer && backupThread.ThreadState != ThreadState.AbortRequested && backupThread.ThreadState != ThreadState.Aborted)
             {
                 Invoke(new Action(() => OnFinishFileTransferCallback(fileSize)));
             }
@@ -858,7 +875,7 @@ namespace SimpleBackup
             //reset UI elements
             backupButton.Text = "Start Backup";
             backupIsRunning = false;
-            thread = null;
+            backupThread = null;
             backupStartTime = new DateTime();
 
             //automatically close the program if the 'scheduledRun' argument was supplied and 'scheduleAutoClose' is set
@@ -897,13 +914,13 @@ namespace SimpleBackup
             StopTransferStatTimer();
 
             //abort the backup thread
-            if (thread != null)
+            if (backupThread != null)
             {
-                thread.Abort();
+                backupThread.Abort();
 
                 //wait for thread to be aborted (or maxThreadAbortWaitTime reached)
                 int timeCounter = 0;
-                while (thread.ThreadState != ThreadState.AbortRequested && timeCounter < maxThreadAbortWaitTime)
+                while (backupThread.ThreadState != ThreadState.AbortRequested && timeCounter < maxThreadAbortWaitTime)
                 {
                     timeCounter += 100;
                     Thread.Sleep(100);
@@ -1250,7 +1267,7 @@ namespace SimpleBackup
         }
 
         /// <summary>
-        /// Callback to the main thread when a backup starts (for tracking file transfer stats)
+        /// Async callback from <seealso cref="Backup"/> to the main thread when a backup starts (for tracking file transfer stats)
         /// </summary>
         /// <param name="totalSizeOfFiles">The total size of files which need to be transfered</param>
         private void OnStartBackupCallback(ulong totalSizeOfFiles)
@@ -1260,7 +1277,7 @@ namespace SimpleBackup
         }
 
         /// <summary>
-        /// Callback to the main thread when starting a file transfer (for tracking file transfer stats)
+        /// Async callback from <seealso cref="TransferFile"/> to the main thread when starting a file transfer (for tracking file transfer stats)
         /// </summary>
         /// <param name="filePath">The path of the file that is to be transfered</param>
         private void OnStartFileTransferCallback(string filePath)
@@ -1271,7 +1288,7 @@ namespace SimpleBackup
         }
 
         /// <summary>
-        /// Callback to the main thread when finishing a file transfer (for tracking file transfer stats)
+        /// Async callback from <seealso cref="TransferFile"/> to the main thread when finishing a file transfer (for tracking file transfer stats)
         /// </summary>
         /// <param name="fileSize">The size of the file that was transfered</param>
         private void OnFinishFileTransferCallback(ulong fileSize)
@@ -1283,7 +1300,7 @@ namespace SimpleBackup
         }
 
         /// <summary>
-        /// Callback to the main thread when a file transfer fails (for tracking file transfer stats)
+        /// Async callback from <seealso cref="TransferFile"/> to the main thread when a file transfer fails (for tracking file transfer stats)
         /// </summary>
         /// <param name="fileSize">The size of the file that failed to be transfered</param>
         private void OnFailedFileTransferCallback(ulong fileSize)
@@ -1301,13 +1318,13 @@ namespace SimpleBackup
         private void TransferStatTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             //callback to the main thread
-            Invoke(new Action(() => CalculateTransferStats()));
+            Invoke(new Action(() => CalculateTransferStatsCallback()));
         }
 
         /// <summary>
-        /// Calculates transfer stats to be displayed to the user during a backup transfer
+        /// Async callback from <seealso cref="TransferStatTimerElapsed"/>. Calculates transfer stats to be displayed to the user during a backup transfer
         /// </summary>
-        private void CalculateTransferStats()
+        private void CalculateTransferStatsCallback()
         {
             ulong fileSizeDiff = 0;
 
@@ -1392,6 +1409,7 @@ namespace SimpleBackup
             useMD5ForTransferCheckBox.Checked = Settings.data.useMD5ForTransfer;
             useMD5ForComparisonCheckBox.Checked = Settings.data.useMD5ForComparison;
             transferUnchangedFilesCheckBox.Checked = Settings.data.transferUnchangedFiles;
+            checkForUpdateCheckBox.Checked = Settings.data.checkForUpdateOnLaunch;
             writeToLogCheckBox.Checked = Settings.data.writeToLog;
         }
 
@@ -1539,21 +1557,21 @@ namespace SimpleBackup
             filterIgnoreComboBox.Items.Clear();
             foreach (Enum value in Enum.GetValues(typeof(BackupFilterIgnoreType)))
             {
-                filterIgnoreComboBox.Items.Add(EnumToString(value));
+                filterIgnoreComboBox.Items.Add(EnumToFormattedString(value));
             }
             filterIgnoreComboBox.SelectedIndex = 0;
 
             filterPathTypeComboBox.Items.Clear();
             foreach (Enum value in Enum.GetValues(typeof(BackupFilterPathType)))
             {
-                filterPathTypeComboBox.Items.Add(EnumToString(value));
+                filterPathTypeComboBox.Items.Add(EnumToFormattedString(value));
             }
             filterPathTypeComboBox.SelectedIndex = 0;
 
             filterComparerTypeComboBox.Items.Clear();
             foreach (Enum value in Enum.GetValues(typeof(BackupFilterComparerType)))
             {
-                filterComparerTypeComboBox.Items.Add(EnumToString(value));
+                filterComparerTypeComboBox.Items.Add(EnumToFormattedString(value));
             }
             filterComparerTypeComboBox.SelectedIndex = 0;
 
@@ -1573,6 +1591,7 @@ namespace SimpleBackup
             Settings.data.sourcePaths = ListBoxItemsToList<string>(ref sourcesListBox);
             Settings.data.destinationPaths = ListBoxItemsToList<string>(ref destinationsListBox);
             Settings.data.transferUnchangedFiles = transferUnchangedFilesCheckBox.Checked;
+            Settings.data.checkForUpdateOnLaunch = checkForUpdateCheckBox.Checked;
             Settings.data.writeToLog = writeToLogCheckBox.Checked;
             Settings.Save();
         }
@@ -1818,6 +1837,9 @@ namespace SimpleBackup
             }
         }
 
+        /// <summary>
+        /// Sends a test email to check that the email settings are correctly configured
+        /// </summary>
         private void SendTestEmail()
         {
             if (!isSendingTestEmail && !isSendingEmail)
@@ -1829,6 +1851,11 @@ namespace SimpleBackup
             }
         }
 
+        /// <summary>
+        /// Sends an email using the encrypted email settings
+        /// </summary>
+        /// <param name="subject">The subject of the email</param>
+        /// <param name="message">The main message of the email</param>
         private void SendEmail(string subject, string message)
         {
             isSendingEmail = true;
@@ -1841,7 +1868,7 @@ namespace SimpleBackup
                     smtpClient = null;
                 }
 
-                //setup SMTP client
+                //setup SMTP client with decrypted user settings
                 smtpClient = new SmtpClient(Settings.DecryptString(Settings.data.emailServer))
                 {
                     Port = Settings.DecryptInt(Settings.data.emailServerPort),
@@ -1850,7 +1877,7 @@ namespace SimpleBackup
                 };
 
                 smtpClient.SendCompleted += OnEmailSendCompletedCallback;
-                smtpClient.Timeout = 20000;
+
                 //send email async
                 smtpClient.SendMailAsync(Settings.DecryptString(Settings.data.emailSender), Settings.DecryptString(Settings.data.emailReceiver), subject, message);
             }
@@ -1864,30 +1891,28 @@ namespace SimpleBackup
 
                 if (isSendingTestEmail)
                 {
-                    MessageBox.Show("Error sending test email: " + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    OnTestEmailSendCompletedCallback();
+                    MessageBox.Show("Error sending test email: Please ensure that your settings are correct and that the internet is connected. " + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    OnTestEmailSendCompleted();
                 }
                 else
                 {
-                    Log.WriteLine("Couldn't send email: " + e.Message, isError: true);
+                    Log.WriteLine("Couldn't send email: Please ensure that your settings are correct and that the internet is connected. " + e.Message, isError: true);
                 }
 
                 isSendingEmail = false;
             }
         }
 
-        /// <summary>
-        /// Callback from send test email completed async method
-        /// </summary>
-        private void OnTestEmailSendCompletedCallback()
+        private void OnTestEmailSendCompleted()
         {
+            //reset UI elements
             sendTestEmailButton.Text = "Send Test Email";
             tabControl.Enabled = true;
             isSendingTestEmail = false;
         }
 
         /// <summary>
-        /// Callback from send email completed async method
+        /// Async callback from <seealso cref="SendEmail"/> when sending an email has completed
         /// </summary>
         /// <param name="sender">The object that triggered the email completed event</param>
         /// <param name="e">Additional data provided by the email completed event</param>
@@ -1898,11 +1923,11 @@ namespace SimpleBackup
             {
                 if (isSendingTestEmail)
                 {
-                    MessageBox.Show("Error sending test email: " + e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Error sending test email: Please ensure that your settings are correct and that the internet is connected. " + e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    Log.WriteLine("Error sending email: " + e.Error.Message, isError: true);
+                    Log.WriteLine("Error sending email: Please ensure that your settings are correct and that the internet is connected. " + e.Error.Message, isError: true);
                 }
             }
             else if (e.Cancelled)
@@ -1931,7 +1956,7 @@ namespace SimpleBackup
 
             if (isSendingTestEmail)
             {
-                OnTestEmailSendCompletedCallback();
+                OnTestEmailSendCompleted();
             }
             else
             {
@@ -1956,7 +1981,7 @@ namespace SimpleBackup
         }
 
         /// <summary>
-        /// Callback when the log is updated with new text
+        /// Async callback from <seealso cref="Log.WriteLine(string, bool, bool)"/> when the log is updated with new text
         /// </summary>
         /// <param name="sender">The object that triggered the log updated event</param>
         /// <param name="e">Additional data provided by the log updated event</param>
@@ -1964,7 +1989,7 @@ namespace SimpleBackup
         {
             OnLogUpdatedEventArgs args = (OnLogUpdatedEventArgs)e;
             //callback to main thread
-            if (InvokeRequired && thread != null && thread.ThreadState != ThreadState.AbortRequested && thread.ThreadState != ThreadState.Aborted)
+            if (InvokeRequired && backupThread != null && backupThread.ThreadState != ThreadState.AbortRequested && backupThread.ThreadState != ThreadState.Aborted)
             {
                 Invoke(new Action(() =>
                 {
@@ -1975,6 +2000,159 @@ namespace SimpleBackup
             {
                 AppendInfoTextBoxText(args.text);
             }
+        }
+
+        /// <summary>
+        /// Begins a new thread to start and app update check
+        /// </summary>
+        private void StartAppUpdateCheckThread()
+        {
+            checkForUpdateButton.Text = "Checking...";
+            checkForUpdateButton.Enabled = false;
+
+            if (appUpdateThread == null)
+            {
+                if (isCheckingForUpdateOnLaunch)
+                {
+                    Log.WriteLine("Searching for the latest app version...");
+                }
+                //start up new thread in order to not lock up any other thread when making web requests
+                ThreadStart threadStart = new ThreadStart(GetServerLatestAppVersion);
+                appUpdateThread = new Thread(threadStart);
+                appUpdateThread.Start();
+            }
+        }
+
+        /// <summary>
+        /// Requests the latest app version from the update server: <see href="https://github.com/Aelstraz/SimpleBackup/releases/latest"></see>
+        /// </summary>
+        private void GetServerLatestAppVersion()
+        {
+            WebResponse response = null;
+            string responseUrl = null;
+
+            try
+            {
+                //create new request to update servere
+                HttpWebRequest httpWebRequest = WebRequest.CreateHttp(updateServerUrl);
+                httpWebRequest.Timeout = updateServerRequestTimeOut;
+                //wait for response
+                response = httpWebRequest.GetResponse();
+                responseUrl = response.ResponseUri.ToString();
+            }
+            catch (ThreadAbortException)
+            {
+
+            }
+            catch (Exception e)
+            {
+                if (isCheckingForUpdateOnLaunch)
+                {
+                    Log.WriteLine("Unable to connect to the app update server: " + updateServerUrl + ". " + e.Message);
+                }
+                else
+                {
+                    MessageBox.Show("Unable to connect to the app update server: " + updateServerUrl + ". " + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            if (response != null)
+            {
+                response.Dispose();
+            }
+
+            //return response to main thread
+            if (InvokeRequired && appUpdateThread != null && appUpdateThread.ThreadState != ThreadState.AbortRequested && appUpdateThread.ThreadState != ThreadState.Aborted)
+            {
+                Invoke(new Action(() => { GetServerLatestAppVersionCallback(responseUrl); }));
+            }
+        }
+
+        /// <summary>
+        /// Async callback from <seealso cref="GetServerLatestAppVersion"/> when getting the latest app version
+        /// </summary>
+        /// <param name="responseUrl">The response URL from the update server (can be null if no response was received)</param>
+        private void GetServerLatestAppVersionCallback(string responseUrl)
+        {
+            //check if we got a response
+            if (responseUrl == null)
+            {
+                //no response
+                if (isCheckingForUpdateOnLaunch)
+                {
+                    Log.WriteLine("No response received from the update server: " + updateServerUrl);
+                }
+                else
+                {
+                    MessageBox.Show("No response received from the update server: " + updateServerUrl, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                //response received
+                string currentVersion = "v" + Application.ProductVersion;
+                //get only the last part of url that contains the version number
+                string latestVersion = Path.GetFileName(responseUrl);
+                //extract the numbers from the strings so we can compare them
+                List<int> currentVersionNumbers = ExtractNumbersFromVersion(currentVersion);
+                List<int> latestVersionNumbers = ExtractNumbersFromVersion(latestVersion);
+
+                //check if we were able to extract any valid data from the latest version string
+                if (latestVersionNumbers == null || latestVersionNumbers.Count == 0)
+                {
+                    //numbers are invalid
+                    if (isCheckingForUpdateOnLaunch)
+                    {
+                        Log.WriteLine("Failed to find the latest app version, no valid version was found at: " + updateServerUrl);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to find the latest app version, no valid version was found at: " + updateServerUrl, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    //numbers are valid
+                    if (isCheckingForUpdateOnLaunch)
+                    {
+                        Log.WriteLine("Current version: " + currentVersion);
+                        Log.WriteLine("Latest version: " + latestVersion);
+                    }
+
+                    //check which version is greater
+                    if (VersionIsGreater(ref latestVersionNumbers, ref currentVersionNumbers))
+                    {
+                        //latest version is greater than the current version
+                        if (isCheckingForUpdateOnLaunch)
+                        {
+                            Log.WriteLine("A new update (" + latestVersion + ") is available from: " + updateServerUrl);
+                        }
+
+                        //let the user know that a new version is available, if not in auto-run mode
+                        if (!autoRun)
+                        {
+                            MessageBox.Show("A new update (" + latestVersion + ") is available from: " + updateServerUrl, "New Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    else
+                    {
+                        //current version is greater than or the same as the latest version
+                        if (isCheckingForUpdateOnLaunch)
+                        {
+                            Log.WriteLine("Software is up to date!");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Software is up to date!", "Up To Date", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                }
+            }
+
+            appUpdateThread = null;
+            isCheckingForUpdateOnLaunch = false;
+            checkForUpdateButton.Text = "Check For Update";
+            checkForUpdateButton.Enabled = true;
         }
 
         /// <summary>
@@ -2229,6 +2407,123 @@ namespace SimpleBackup
             return passes;
         }
 
+        /// <summary>
+        /// Checks whether the collection of version numbers A, is greater than the version numbers of B (order matters)
+        /// </summary>
+        /// <param name="versionNumbersA">The first list of numbers in the sequence of a version number to compare</param>
+        /// <param name="versionNumbersB">The second list of numbers in the sequence of a version number to compare against</param>
+        /// <returns>Whether versionNumbersA is greater than versionNumbersB</returns>
+        private bool VersionIsGreater(ref List<int> versionNumbersA, ref List<int> versionNumbersB)
+        {
+            //A has no numbers but B does
+            if (versionNumbersA.Count == 0 && versionNumbersB.Count > 0)
+            {
+                //B is greater
+                return false;
+            }
+            //B has no numbers but A does
+            else if (versionNumbersB.Count == 0 && versionNumbersA.Count > 0)
+            {
+                //A is greater
+                return true;
+            }
+
+            bool isGreater = false;
+
+            //go through each number of A and compare against B
+            for (int i = 0; i < versionNumbersA.Count; i++)
+            {
+                //check if A has exceeded the amount of numbers B has, or if the current number of A is greater than B
+                if (i >= versionNumbersB.Count || versionNumbersA[i] > versionNumbersB[i])
+                {
+                    isGreater = true;
+                    break;
+                }
+            }
+            return isGreater;
+        }
+
+        /// <summary>
+        /// Extracts the numbers contained within a string representing a version number e.g. "v2.0.1", and puts them into a list
+        /// </summary>
+        /// <param name="version">A string representing a version number e.g. "v2.0.1"</param>
+        /// <returns>A list containing each number in sequence (left to right) found in the version string, or null if the input string is invalid</returns>
+        private List<int> ExtractNumbersFromVersion(string version)
+        {
+            List<int> numbers = new List<int>();
+            string currentNumber = "";
+            version = version.Trim();
+            int startIndex = 0;
+            bool valid = true;
+
+            //make sure that the string isn't empty
+            if (string.IsNullOrEmpty(version))
+            {
+                return null;
+            }
+            //if the first char is a 'v' then ignore it and start at the next index
+            else if (version[0] == 'v')
+            {
+                startIndex = 1;
+            }
+
+            try
+            {
+                //go through each character of the string
+                for (int i = startIndex; i < version.Length; i++)
+                {
+                    //check if it's a digit
+                    if (char.IsDigit(version[i]))
+                    {
+                        //add it to the current number string
+                        currentNumber += version[i];
+                    }
+                    //check if it's a seperator character
+                    else if (version[i] == '.' || version[i] == ' ')
+                    {
+                        //check if there is anything accumulated in the current number string
+                        if (string.IsNullOrEmpty(currentNumber))
+                        {
+                            //string is invalid
+                            valid = false;
+                            break;
+                        }
+                        else
+                        {
+                            //parse the currently accumulated number in the current number string and add it to our list
+                            numbers.Add(int.Parse(currentNumber));
+                            //reset the current number string for the next set of digit character(s)
+                            currentNumber = "";
+                        }
+                    }
+                    else
+                    {
+                        //any other character is invalid
+                        valid = false;
+                        break;
+                    }
+                }
+
+                if (!valid)
+                {
+                    return null;
+                }
+                //check if there is a number still left in the accumulated in the current number string
+                else if (!string.IsNullOrEmpty(currentNumber))
+                {
+                    //parse the accumulated number in the current number string and add it to our list
+                    numbers.Add(int.Parse(currentNumber));
+                }
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine("The received version number is in an invalid format. " + e.Message, isError: true);
+                return null;
+            }
+
+            return numbers;
+        }
+
         private bool PathIsFolder(string path)
         {
             return !Path.HasExtension(path) || (Path.GetExtension(path) == Path.GetFileName(path));
@@ -2237,9 +2532,9 @@ namespace SimpleBackup
         private void FilterListViewAdd(BackupFilter filter)
         {
             ListViewItem item = filterListView.Items.Add((filterListView.Items.Count + 1).ToString());
-            item.SubItems.Add(EnumToString(filter.backupFilterIgnoreType));
-            item.SubItems.Add(EnumToString(filter.backupFilterPathType));
-            item.SubItems.Add(EnumToString(filter.backupFilterComparerType));
+            item.SubItems.Add(EnumToFormattedString(filter.backupFilterIgnoreType));
+            item.SubItems.Add(EnumToFormattedString(filter.backupFilterPathType));
+            item.SubItems.Add(EnumToFormattedString(filter.backupFilterComparerType));
             item.SubItems.Add(filter.value);
             item.SubItems.Add(filter.ignoreCase.ToString());
             filterListView.SelectedItems.Clear();
@@ -2273,16 +2568,16 @@ namespace SimpleBackup
 
         private BackupFilter FilterListViewGetAt(int index)
         {
-            BackupFilterIgnoreType backupFilterIgnoreType = StringToEnum<BackupFilterIgnoreType>(filterListView.Items[index].SubItems[1].Text);
-            BackupFilterPathType backupFilterPathType = StringToEnum<BackupFilterPathType>(filterListView.Items[index].SubItems[2].Text);
-            BackupFilterComparerType backupFilterComparerType = StringToEnum<BackupFilterComparerType>(filterListView.Items[index].SubItems[3].Text);
+            BackupFilterIgnoreType backupFilterIgnoreType = FormattedStringToEnum<BackupFilterIgnoreType>(filterListView.Items[index].SubItems[1].Text);
+            BackupFilterPathType backupFilterPathType = FormattedStringToEnum<BackupFilterPathType>(filterListView.Items[index].SubItems[2].Text);
+            BackupFilterComparerType backupFilterComparerType = FormattedStringToEnum<BackupFilterComparerType>(filterListView.Items[index].SubItems[3].Text);
             string value = filterListView.Items[index].SubItems[4].Text;
             bool ignoreCase = bool.Parse(filterListView.Items[index].SubItems[5].Text);
 
             return new BackupFilter(backupFilterIgnoreType, backupFilterPathType, backupFilterComparerType, ignoreCase, value);
         }
 
-        private string EnumToString(Enum e)
+        private string EnumToFormattedString(Enum e)
         {
             string enumName = e.ToString();
             string newString = "";
@@ -2316,7 +2611,7 @@ namespace SimpleBackup
             return newString;
         }
 
-        private T StringToEnum<T>(string enumString)
+        private T FormattedStringToEnum<T>(string enumString)
         {
             enumString = enumString.Trim();
             enumString = enumString.ToUpper();
@@ -2583,6 +2878,11 @@ namespace SimpleBackup
             {
                 MessageBox.Show("No filter selected to be removed", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void checkForUpdateButton_Click(object sender, EventArgs e)
+        {
+            StartAppUpdateCheckThread();
         }
 
         #endregion

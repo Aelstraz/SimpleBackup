@@ -16,6 +16,7 @@ namespace SimpleBackup
         public string backupName { get; set; } = "SimpleBackup";
         public bool useMD5ForTransfer { get; set; } = true;
         public bool useMD5ForComparison { get; set; } = false;
+        public bool checkForUpdateOnLaunch { get; set; } = true;
         public bool writeToLog { get; set; } = true;
         public bool scheduleAutoClose { get; set; } = true;
         public bool useEmail { get; set; } = false;
